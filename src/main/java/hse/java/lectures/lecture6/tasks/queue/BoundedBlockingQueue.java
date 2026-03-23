@@ -4,7 +4,6 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 public class BoundedBlockingQueue<T> {
-
     private final Queue<T> queue = new ArrayDeque<>();
     private final int capacity;
 
