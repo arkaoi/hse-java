@@ -17,17 +17,23 @@ public class Synchronizer {
         this.ticksPerWriter = ticksPerWriter;
     }
 
-    /**
-     * Starts infinite writer threads and waits until each writer prints exactly ticksPerWriter ticks
-     * in strict ascending id order.
-     */
     public void execute() {
-        // add monitor and sync
+        StreamingMonitor monitor = new StreamingMonitor(tasks.size(), ticksPerWriter);
+
+        for (StreamWriter writer : tasks) {
+            writer.attachMonitor(monitor);
+        }
+
         for (StreamWriter writer : tasks) {
             Thread worker = new Thread(writer, "stream-writer-" + writer.getId());
             worker.setDaemon(true);
             worker.start();
         }
-    }
 
+        try {
+            monitor.synchFinish();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
 }
